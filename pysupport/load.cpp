@@ -33,4 +33,3 @@ boost::python::object load(const std::string &name
 }
 
 } // namespace pysupport
-u
