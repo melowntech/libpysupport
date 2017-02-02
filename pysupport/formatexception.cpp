@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <thread>
+#include <mutex>
 
 #include "dbglog/dbglog.hpp"
 
