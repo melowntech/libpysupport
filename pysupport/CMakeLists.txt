@@ -1,4 +1,8 @@
-define_module(LIBRARY pysupport DEPENDS utility Boost_PYTHON)
+# bump version here
+set(pysupport_VERSION 1.0)
+
+define_module(LIBRARY pysupport=${pysupport_VERSION}
+  DEPENDS utility Boost_PYTHON)
 
 buildsys_compile_with_install_prefix()
 

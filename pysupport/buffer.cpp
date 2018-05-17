@@ -35,7 +35,13 @@ boost::python::handle<> buffer(const void *data, std::size_t size)
     using namespace boost::python;
 
     // ugly const cast needed because of python interface...
+#if PY_MAJOR_VERSION == 2
     auto buf(PyBuffer_FromMemory(const_cast<void*>(data), size));
+#else
+    auto buf(PyMemoryView_FromMemory
+             (const_cast<char*>(static_cast<const char*>(data))
+              , size, PyBUF_READ));
+#endif
     if (!buf) { throw error_already_set(); }
     return handle<>(borrowed<>(buf));
 }
