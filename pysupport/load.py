@@ -48,11 +48,12 @@ class Loader:
         if self.compiled:
             import marshal
             # TODO: use buffer slice
-            code = marshal.loads(self.contents[8:])
+            offset = 8 if (sys.version_info[0] < 3) else 12
+            code = marshal.loads(self.contents[offset:])
         else:
             code = compile(self.contents, mod.__file__, "exec")
 
-        exec code in mod.__dict__
+        exec(code, mod.__dict__)
         return mod
 
 module = Loader(fullname, contents, compiled).load_module(fullname)

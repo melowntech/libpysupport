@@ -56,6 +56,7 @@ std::string formatCurrentException()
         ::PyObject *rawValue(nullptr);
         ::PyObject *rawTraceback(nullptr);
         ::PyErr_Fetch(&rawType, &rawValue, &rawTraceback);
+        ::PyErr_NormalizeException(&rawType, &rawValue, &rawTraceback);
 
         typedef py::handle< ::PyObject> Handle;
 

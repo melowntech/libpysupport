@@ -22,12 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import cStringIO
 import traceback
 
-import sys
-
 def format(type, value, tb):
-    out = cStringIO.StringIO()
-    traceback.print_exception(type, value, tb, None, out)
-    return out.getvalue()
+    return "".join(traceback.format_exception(type, value, tb))
