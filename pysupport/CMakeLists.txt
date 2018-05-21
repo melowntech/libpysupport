@@ -11,11 +11,13 @@ file_to_cpp(pysupport_PY_SOURCES pysupport::detail::load load.py)
 py_to_pyc(pysupport_PY_SOURCES pysupport::detail::formatexception formatexception.py)
 
 set(pysupport_SOURCES
+  hasattr.hpp
   buffer.hpp buffer.cpp
   import.hpp import.cpp
   load.hpp load.cpp
   runnable.hpp runnable.cpp
   formatexception.hpp formatexception.cpp
+  package.hpp package.cpp
   ${pysupport_PY_SOURCES}
 )
 
