@@ -24,41 +24,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mutex>
+#include <string>
+#include <vector>
 
-#include "dbglog/dbglog.hpp"
-
-#include "./package.hpp"
-
-namespace bp = boost::python;
-
-BOOST_PYTHON_MODULE(melown)
-{
-    // pass
-}
+#include <boost/python/slice.hpp>
 
 namespace pysupport {
 
-namespace {
-std::once_flag onceFlag;
-} // namespace
-
-bp::object package()
+/** Fill sys.argv with the content of provided vector.
+ */
+void argv(const Argv &argv)
 {
-    typedef bp::handle< ::PyObject> Handle;
 
-    std::call_once(onceFlag, [&]()
-    {
-#if PY_MAJOR_VERSION == 2
-        initmelown();
-#else
-        Handle module(::PyInit_melown());
-        auto sys(bp::import("sys"));
-        sys.attr("modules")["melown"] = module;
-#endif
-    });
-
-    return bp::import("melown");
 }
 
 } // namespace pysupport

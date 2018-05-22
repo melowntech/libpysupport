@@ -32,7 +32,7 @@
 import imp
 import dbglog as log
 
-log.info3("Importing module {} from path \"{}\".", name, path)
+log.info1("Importing module {} from path \"{}\".", name, path)
 spec = imp.find_module(name, [path])
 
 try:

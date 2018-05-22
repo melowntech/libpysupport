@@ -24,41 +24,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mutex>
+#ifndef pysupport_argv_hpp_included_
+#define pysupport_argv_hpp_included_
 
-#include "dbglog/dbglog.hpp"
+#include <string>
+#include <vector>
 
-#include "./package.hpp"
+#include <boost/filesystem/path.hpp>
 
-namespace bp = boost::python;
+#include <boost/python.hpp>
 
-BOOST_PYTHON_MODULE(melown)
-{
-    // pass
-}
+#include <iostream>
 
 namespace pysupport {
 
-namespace {
-std::once_flag onceFlag;
-} // namespace
+typedef std::vector<std::string> Argv;
 
-bp::object package()
+/** Fill sys.argv with the content of provided vector.
+ */
+template <typename ...Args> void argv(Args &&...arg);
+
+// inlines
+
+namespace detail {
+
+void argvImpl(const Argv &argv);
+
+inline void addArg(Argv &argv, const std::string &arg)
 {
-    typedef bp::handle< ::PyObject> Handle;
+    argv.push_back(arg);
+}
 
-    std::call_once(onceFlag, [&]()
-    {
-#if PY_MAJOR_VERSION == 2
-        initmelown();
-#else
-        Handle module(::PyInit_melown());
-        auto sys(bp::import("sys"));
-        sys.attr("modules")["melown"] = module;
-#endif
-    });
+inline void addArg(Argv &argv, const boost::filesystem::path &arg)
+{
+    argv.push_back(arg.string());
+}
 
-    return bp::import("melown");
+inline void addArg(Argv &argv, const Argv &arg)
+{
+    argv.insert(argv.end(), arg.begin(), arg.end());
+}
+
+inline void buildArgv(Argv&) {}
+
+template <typename T, typename ...Args>
+void buildArgv(Argv &argv, T &&arg, Args &&...rest)
+{
+    addArg(argv, arg);
+    buildArgv(argv, std::forward<Args>(rest)...);
+}
+
+} // namespace detail
+
+template <typename ...Args>
+void argv(Args &&...args)
+{
+    Argv tmpArgv;
+    detail::buildArgv(tmpArgv, std::forward<Args>(args)...);
+    detail::argvImpl(tmpArgv);
 }
 
 } // namespace pysupport
+
+#endif // pysupport_argv_hpp_included_

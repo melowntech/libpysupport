@@ -24,41 +24,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mutex>
+#include <string>
+#include <vector>
 
-#include "dbglog/dbglog.hpp"
+#include <boost/python/slice.hpp>
+#include <boost/python/object_slices.hpp>
 
-#include "./package.hpp"
+#include "./argv.hpp"
+#include "./hasattr.hpp"
+#include "./setattr.hpp"
 
 namespace bp = boost::python;
 
-BOOST_PYTHON_MODULE(melown)
+namespace pysupport { namespace detail {
+
+/** Fill sys.argv with the content of provided vector.
+ */
+void argvImpl(const Argv &argv)
 {
-    // pass
+    auto sys(bp::import("sys"));
+    bp::list sys_argv;
+    if (hasattr(sys, "argv")) {
+        // get and clear
+        sys_argv = bp::list(sys.attr("argv"));
+        del(sys_argv[bp::slice()]);
+    } else {
+        // inject new
+        setattr(sys, "argv", sys_argv);
+    }
+
+    for (const auto arg : argv) {
+        sys_argv.append(bp::str(arg));
+    }
 }
 
-namespace pysupport {
-
-namespace {
-std::once_flag onceFlag;
-} // namespace
-
-bp::object package()
-{
-    typedef bp::handle< ::PyObject> Handle;
-
-    std::call_once(onceFlag, [&]()
-    {
-#if PY_MAJOR_VERSION == 2
-        initmelown();
-#else
-        Handle module(::PyInit_melown());
-        auto sys(bp::import("sys"));
-        sys.attr("modules")["melown"] = module;
-#endif
-    });
-
-    return bp::import("melown");
-}
-
-} // namespace pysupport
+} } // namespace pysupport::detail

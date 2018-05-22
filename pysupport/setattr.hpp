@@ -24,41 +24,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mutex>
+#ifndef pysupport_setattr_hpp_included_
+#define pysupport_setattr_hpp_included_
 
-#include "dbglog/dbglog.hpp"
-
-#include "./package.hpp"
-
-namespace bp = boost::python;
-
-BOOST_PYTHON_MODULE(melown)
-{
-    // pass
-}
+#include <boost/python.hpp>
 
 namespace pysupport {
 
-namespace {
-std::once_flag onceFlag;
-} // namespace
+void setattr(const boost::python::object &o, const char *name
+             , const boost::python::object &attr);
 
-bp::object package()
+// inlines
+
+inline void setattr(const boost::python::object &o, const char *name
+                    , const boost::python::object &attr)
 {
-    typedef bp::handle< ::PyObject> Handle;
-
-    std::call_once(onceFlag, [&]()
-    {
-#if PY_MAJOR_VERSION == 2
-        initmelown();
-#else
-        Handle module(::PyInit_melown());
-        auto sys(bp::import("sys"));
-        sys.attr("modules")["melown"] = module;
-#endif
-    });
-
-    return bp::import("melown");
+    if (-1 == ::PyObject_SetAttrString(o.ptr(), name, attr.ptr())) {
+        boost::python::throw_error_already_set();
+    }
 }
 
 } // namespace pysupport
+
+#endif // pysupport_setattr_hpp_included_
+
