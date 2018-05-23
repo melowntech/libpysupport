@@ -24,10 +24,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <vector>
 #include <mutex>
 
 #include <boost/format.hpp>
 #include <boost/filesystem/path.hpp>
+
+#include <boost/python/class.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "dbglog/dbglog.hpp"
 
@@ -50,16 +54,22 @@ struct to_python_path {
 
 BOOST_PYTHON_MODULE(melown)
 {
-    bp::to_python_converter<
+    using namespace bp;
+
+    to_python_converter<
         boost::filesystem::path, pysupport::to_python_path>();
 
-    bp::to_python_converter<
+    to_python_converter<
         boost::optional<std::string>
         , pysupport::to_python_optional<std::string>>();
 
-    bp::to_python_converter<
+    to_python_converter<
         boost::optional<boost::filesystem::path>
         , pysupport::to_python_optional<boost::filesystem::path>>();
+
+    class_<std::vector<double>>("double_list")
+        .def(vector_indexing_suite<std::vector<double>>())
+        ;
 }
 
 namespace pysupport {
