@@ -14,6 +14,9 @@ set(pysupport_SOURCES
   hasattr.hpp
   setattr.hpp
   class.hpp
+  enum.hpp
+  converters.hpp
+
   buffer.hpp buffer.cpp
   import.hpp import.cpp
   load.hpp load.cpp

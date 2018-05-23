@@ -26,15 +26,40 @@
 
 #include <mutex>
 
+#include <boost/format.hpp>
+#include <boost/filesystem/path.hpp>
+
 #include "dbglog/dbglog.hpp"
 
 #include "./package.hpp"
+#include "./converters.hpp"
 
 namespace bp = boost::python;
 
+namespace pysupport {
+
+const char* packageName("melown");
+
+struct to_python_path {
+    static PyObject* convert(const boost::filesystem::path &obj) {
+        return bp::incref(bp::object(obj.string()).ptr());
+    }
+};
+
+} // namespace pysupport
+
 BOOST_PYTHON_MODULE(melown)
 {
-    // pass
+    bp::to_python_converter<
+        boost::filesystem::path, pysupport::to_python_path>();
+
+    bp::to_python_converter<
+        boost::optional<std::string>
+        , pysupport::to_python_optional<std::string>>();
+
+    bp::to_python_converter<
+        boost::optional<boost::filesystem::path>
+        , pysupport::to_python_optional<boost::filesystem::path>>();
 }
 
 namespace pysupport {
@@ -54,11 +79,28 @@ bp::object package()
 #else
         Handle module(::PyInit_melown());
         auto sys(bp::import("sys"));
-        sys.attr("modules")["melown"] = module;
+        sys.attr("modules")[pysupport::packageName] = module;
 #endif
     });
 
-    return bp::import("melown");
+    return bp::import(packageName);
+}
+
+void addModuleToPackage(const char *name, ::PyObject *module)
+{
+    auto p(package());
+
+    typedef bp::handle< ::PyObject> Handle;
+    Handle m(module);
+
+    if (-1 == ::PyModule_AddObject(p.ptr(), name, bp::incref(module))) {
+        LOGTHROW(err2, std::runtime_error)
+            << "PyModule_AddObject failed";
+    }
+
+    auto sys(bp::import("sys"));
+    sys.attr("modules")[str(boost::format("%s.%s")
+                            % packageName % name)] = m;
 }
 
 } // namespace pysupport

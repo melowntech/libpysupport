@@ -24,36 +24,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef pysupport_package_hpp_included_
-#define pysupport_package_hpp_included_
-
-#include <mutex>
+#ifndef pysupport_converters_hpp_included_
+#define pysupport_converters_hpp_included_
 
 #include <boost/python.hpp>
+#include <boost/optional.hpp>
 
 namespace pysupport {
 
-/** Creates 'melown' package (empty module) and injects it into sys["modules"].
- */
-boost::python::object package();
-
-/** Adds given module to 'melown' package (which is created for the first time).
- */
-void addModuleToPackage(const char *name, ::PyObject *module);
-
-#define PYSUPPORT_MODULE_IMPORT(name)                               \
-    namespace { std::once_flag onceFlag; }                          \
-                                                                    \
-    boost::python::object import() {                                \
-        std::call_once(onceFlag, [&]()                              \
-        {                                                           \
-            pysupport::addModuleToPackage                           \
-                (#name, PyInit_melown_##name());                    \
-        });                                                         \
-                                                                    \
-        return bp::import("melown."#name);                          \
+template <typename T>
+struct to_python_optional {
+    static PyObject* convert(const boost::optional<T> &obj) {
+        using namespace boost::python;
+        if (obj) {
+            return incref(object(*obj).ptr());
+        }
+        return incref(object().ptr());
     }
+};
 
 } // namespace pysupport
 
-#endif // pysupport_package_hpp_included_
+#endif // pysupport_converters_hpp_included_
+

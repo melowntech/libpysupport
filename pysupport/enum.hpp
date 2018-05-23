@@ -24,36 +24,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef pysupport_package_hpp_included_
-#define pysupport_package_hpp_included_
-
-#include <mutex>
+#ifndef pysupport_enum_hpp_included_
+#define pysupport_enum_hpp_included_
 
 #include <boost/python.hpp>
+#include <boost/python/enum.hpp>
 
 namespace pysupport {
 
-/** Creates 'melown' package (empty module) and injects it into sys["modules"].
- */
-boost::python::object package();
-
-/** Adds given module to 'melown' package (which is created for the first time).
- */
-void addModuleToPackage(const char *name, ::PyObject *module);
-
-#define PYSUPPORT_MODULE_IMPORT(name)                               \
-    namespace { std::once_flag onceFlag; }                          \
-                                                                    \
-    boost::python::object import() {                                \
-        std::call_once(onceFlag, [&]()                              \
-        {                                                           \
-            pysupport::addModuleToPackage                           \
-                (#name, PyInit_melown_##name());                    \
-        });                                                         \
-                                                                    \
-        return bp::import("melown."#name);                          \
-    }
+template <typename Enum>
+void fillEnum(const char *type, const char *doc)
+{
+    auto enum_ = boost::python::enum_<Enum>(type, doc);
+    const auto enus(enumerationValues(Enum{}));
+    const auto enusStr(enumerationValuesStringified(Enum{}));
+    auto ienusStr(enusStr.begin());
+    for (const auto &enu : enus) { enum_.value(*ienusStr++, enu); }
+}
 
 } // namespace pysupport
 
-#endif // pysupport_package_hpp_included_
+#endif // pysupport_enum_hpp_included_
+
