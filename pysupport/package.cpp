@@ -39,14 +39,46 @@
 #include "./converters.hpp"
 
 namespace bp = boost::python;
+namespace fs = boost::filesystem;
 
 namespace pysupport {
 
 const char* packageName("melown");
 
 struct to_python_path {
-    static PyObject* convert(const boost::filesystem::path &obj) {
+    static PyObject* convert(const fs::path &obj) {
         return bp::incref(bp::object(obj.string()).ptr());
+    }
+};
+
+/** Creates from-python converter for boost::filesystem::path
+ *  None is mapped to boost::none
+ */
+struct from_python_path
+{
+    typedef boost::python::converter::rvalue_from_python_stage1_data Data;
+    typedef boost::python::converter::rvalue_from_python_storage<
+        fs::path> Storage;
+
+    from_python_path() {
+        boost::python::converter::registry::push_back
+            (&convertible, &construct, boost::python::type_id<fs::path>());
+    }
+
+    // Determine if ptr can be converted in a Optional
+    static void* convertible(::PyObject *ptr) {
+        return PyUnicode_Check(ptr) ? ptr : nullptr;
+    }
+
+    // Convert ptr into a fs::path
+    static void construct(::PyObject *ptr, Data *data) {
+        // get memory
+        void *storage(((Storage*) data)->storage.bytes);
+
+        new (storage) fs::path(boost::python::extract<std::string>(ptr));
+
+        // Stash the memory chunk pointer for later use by boost.python
+        data->convertible = storage;
     }
 };
 
@@ -56,16 +88,11 @@ BOOST_PYTHON_MODULE(melown)
 {
     using namespace bp;
 
-    to_python_converter<
-        boost::filesystem::path, pysupport::to_python_path>();
+    to_python_converter<fs::path, pysupport::to_python_path>();
+    pysupport::from_python_path();
 
-    to_python_converter<
-        boost::optional<std::string>
-        , pysupport::to_python_optional<std::string>>();
-
-    to_python_converter<
-        boost::optional<boost::filesystem::path>
-        , pysupport::to_python_optional<boost::filesystem::path>>();
+    PYSUPPORT_OPTIONAL(std::string);
+    PYSUPPORT_OPTIONAL(fs::path);
 
     class_<std::vector<double>>("double_list")
         .def(vector_indexing_suite<std::vector<double>>())

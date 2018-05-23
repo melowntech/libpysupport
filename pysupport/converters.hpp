@@ -27,14 +27,19 @@
 #ifndef pysupport_converters_hpp_included_
 #define pysupport_converters_hpp_included_
 
+#include <new>
+
 #include <boost/python.hpp>
 #include <boost/optional.hpp>
 
 namespace pysupport {
 
+/** Creates to-python converter for boost::optional<T>
+ *  boost::none is mapped to None
+ */
 template <typename T>
 struct to_python_optional {
-    static PyObject* convert(const boost::optional<T> &obj) {
+    static ::PyObject* convert(const boost::optional<T> &obj) {
         using namespace boost::python;
         if (obj) {
             return incref(object(*obj).ptr());
@@ -42,6 +47,54 @@ struct to_python_optional {
         return incref(object().ptr());
     }
 };
+
+/** Creates from-python converter for boost::optional<T>
+ *  None is mapped to boost::none
+ */
+template <typename T>
+struct from_python_optional
+{
+    typedef boost::optional<T> Optional;
+    typedef boost::python::converter::rvalue_from_python_stage1_data Data;
+    typedef boost::python::converter::rvalue_from_python_storage<
+        Optional> Storage;
+
+    from_python_optional() {
+        boost::python::converter::registry::push_back
+            (&convertible, &construct, boost::python::type_id<Optional>());
+    }
+
+    // Determine if ptr can be converted in a Optional
+    static void* convertible(::PyObject *ptr) {
+        if (ptr == Py_None) { return ptr; }
+        if (boost::python::extract<T>(ptr).check()) { return ptr; }
+        return nullptr;
+    }
+
+    // Convert ptr into a Optional
+    static void construct(::PyObject *ptr, Data *data) {
+        // get memory
+        void *storage(((Storage*) data)->storage.bytes);
+
+        // in-place construct the Optional
+        if (ptr == Py_None) {
+            new (storage) Optional();
+        } else {
+            new (storage) Optional(boost::python::extract<T>(ptr));
+        }
+
+        // Stash the memory chunk pointer for later use by boost.python
+        data->convertible = storage;
+    }
+};
+
+/** Convenient macro for boost::optional<T> two-way converter registration.
+ */
+#define PYSUPPORT_OPTIONAL(type)                                        \
+    boost::python::to_python_converter<                                 \
+        boost::optional<type>                                           \
+    , pysupport::to_python_optional<type>>();                           \
+    pysupport::from_python_optional<type>()
 
 } // namespace pysupport
 
