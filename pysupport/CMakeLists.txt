@@ -13,6 +13,7 @@ py_to_pyc(pysupport_PY_SOURCES pysupport::detail::formatexception formatexceptio
 set(pysupport_SOURCES
   hasattr.hpp
   setattr.hpp
+  class.hpp
   buffer.hpp buffer.cpp
   import.hpp import.cpp
   load.hpp load.cpp
