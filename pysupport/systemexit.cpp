@@ -24,7 +24,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <boost/python.hpp>
+
 #include "./systemexit.hpp"
+
+namespace bp = boost::python;
+
+namespace pysupport {
 
 boost::optional<int> getSystemExit()
 {
@@ -42,7 +48,10 @@ boost::optional<int> getSystemExit()
         bp::handle<> value(bp::allow_null(rawValue));
         bp::handle<> traceback(bp::allow_null(rawTraceback));
 
-        return bp::extract<int>(bp::object(value).attr("code"));
+        return boost::optional<int>
+            (bp::extract<int>(bp::object(value).attr("code")));
     }
     return boost::none;
 }
+
+} // namespace pysupport

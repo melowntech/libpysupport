@@ -17,6 +17,7 @@ set(pysupport_SOURCES
   enum.hpp
   converters.hpp
   iostreams.hpp iostreams.cpp
+  systemexit.hpp systemexit.cpp
 
   buffer.hpp buffer.cpp
   import.hpp import.cpp
