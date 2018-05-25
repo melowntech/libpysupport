@@ -37,6 +37,7 @@
 
 #include "./package.hpp"
 #include "./converters.hpp"
+#include "./iostreams.hpp"
 
 namespace bp = boost::python;
 namespace fs = boost::filesystem;
@@ -65,7 +66,7 @@ struct from_python_path
             (&convertible, &construct, boost::python::type_id<fs::path>());
     }
 
-    // Determine if ptr can be converted in a Optional
+    // Determine if ptr can be converted in an Optional
     static void* convertible(::PyObject *ptr) {
         return PyUnicode_Check(ptr) ? ptr : nullptr;
     }
@@ -90,6 +91,7 @@ BOOST_PYTHON_MODULE(melown)
 
     to_python_converter<fs::path, pysupport::to_python_path>();
     pysupport::from_python_path();
+    pysupport::registerIOStreams();
 
     PYSUPPORT_OPTIONAL(std::string);
     PYSUPPORT_OPTIONAL(fs::path);
@@ -123,7 +125,8 @@ bp::object package()
     return bp::import(packageName);
 }
 
-void addModuleToPackage(const char *name, ::PyObject *module)
+void addModuleToPackage(const char *name, ::PyObject *module
+                        , const PackageCallback &callback)
 {
     auto p(package());
 
@@ -138,6 +141,8 @@ void addModuleToPackage(const char *name, ::PyObject *module)
     auto sys(bp::import("sys"));
     sys.attr("modules")[str(boost::format("%s.%s")
                             % packageName % name)] = m;
+
+    if (callback) { callback(p); }
 }
 
 } // namespace pysupport

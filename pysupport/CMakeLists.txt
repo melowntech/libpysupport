@@ -16,6 +16,7 @@ set(pysupport_SOURCES
   class.hpp
   enum.hpp
   converters.hpp
+  iostreams.hpp iostreams.cpp
 
   buffer.hpp buffer.cpp
   import.hpp import.cpp
