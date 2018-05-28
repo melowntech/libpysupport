@@ -18,6 +18,7 @@ set(pysupport_SOURCES
   converters.hpp
   iostreams.hpp iostreams.cpp
   systemexit.hpp systemexit.cpp
+  repr.hpp repr.cpp
 
   buffer.hpp buffer.cpp
   import.hpp import.cpp
