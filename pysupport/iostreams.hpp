@@ -43,6 +43,15 @@ public:
     virtual std::ostream& ostream() = 0;
 };
 
+class IStream : boost::noncopyable {
+public:
+    typedef std::shared_ptr<IStream> pointer;
+
+    virtual ~IStream() {}
+
+    virtual std::istream& istream() = 0;
+};
+
 void registerIOStreams();
 
 } // namespace pysupport
