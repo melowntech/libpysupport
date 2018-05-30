@@ -37,18 +37,27 @@ namespace pysupport {
  */
 boost::python::object package();
 
-typedef std::function<void(const boost::python::object&)> PackageCallback;
+typedef std::function<void(const boost::python::object&
+                           , const boost::python::object&)>
+PackageCallback;
 
 /** Adds given module to 'melown' package (which is created for the first time).
  */
 void addModuleToPackage(const char *name, ::PyObject *module
                         , const PackageCallback &callback = PackageCallback());
 
+/** Adds given module to provided package.
+ */
+void addModuleToPackage(const char *name, ::PyObject *module
+                        , const char *packageName
+                        , const boost::python::object &package
+                        , const PackageCallback &callback = PackageCallback());
+
 #define PYSUPPORT_MODULE_IMPORT_CALLBACK(name, cb)                  \
-    namespace { std::once_flag onceFlag; }                          \
+    namespace { std::once_flag name##_onceFlag; }                   \
                                                                     \
     boost::python::object import() {                                \
-        std::call_once(onceFlag, [&]()                              \
+        std::call_once(name##_onceFlag, [&]()                       \
         {                                                           \
             pysupport::addModuleToPackage                           \
                 (#name, PyInit_melown_##name(), cb);                \

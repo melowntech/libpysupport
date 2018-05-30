@@ -109,14 +109,12 @@ std::once_flag onceFlag;
 
 bp::object package()
 {
-    typedef bp::handle< ::PyObject> Handle;
-
     std::call_once(onceFlag, [&]()
     {
 #if PY_MAJOR_VERSION == 2
         initmelown();
 #else
-        Handle module(::PyInit_melown());
+        bp::handle<> module(::PyInit_melown());
         auto sys(bp::import("sys"));
         sys.attr("modules")[pysupport::packageName] = module;
 #endif
@@ -130,19 +128,38 @@ void addModuleToPackage(const char *name, ::PyObject *module
 {
     auto p(package());
 
-    typedef bp::handle< ::PyObject> Handle;
-    Handle m(module);
+    bp::handle<> m(module);
 
     if (-1 == ::PyModule_AddObject(p.ptr(), name, bp::incref(module))) {
-        LOGTHROW(err2, std::runtime_error)
-            << "PyModule_AddObject failed";
+        LOG(warn2) << "Failed to add module <" << name
+                   << "> to package <melown>.";
+        bp::throw_error_already_set();
     }
 
     auto sys(bp::import("sys"));
     sys.attr("modules")[str(boost::format("%s.%s")
                             % packageName % name)] = m;
 
-    if (callback) { callback(p); }
+    if (callback) { callback(p, bp::object(m)); }
+}
+
+void addModuleToPackage(const char *name, ::PyObject *module
+                        , const char *packageName, const bp::object &package
+                        , const PackageCallback &callback)
+{
+    bp::handle<> m(module);
+
+    if (-1 == ::PyModule_AddObject(package.ptr(), name, bp::incref(module))) {
+        LOG(warn2) << "Failed to add module <" << name
+                   << "> to package <" << packageName << ">.";
+        bp::throw_error_already_set();
+    }
+
+    auto sys(bp::import("sys"));
+    sys.attr("modules")[str(boost::format("%s.%s")
+                            % packageName % name)] = m;
+
+    if (callback) { callback(package, bp::object(m)); }
 }
 
 } // namespace pysupport
