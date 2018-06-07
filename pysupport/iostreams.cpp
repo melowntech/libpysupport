@@ -162,12 +162,28 @@ struct from_python_istream
     }
 };
 
+void write(std::ostream &os, const bp::object &data)
+{
+    const char *raw = bp::extract<const char*>(data)();
+    int size(bp::extract<int>(data.attr("__len__")()));
+    os.write(raw, size);
+}
+
 } // namespace detail
 
 void registerIOStreams()
 {
+    using namespace bp;
+
     detail::from_python_ostream();
     detail::from_python_istream();
+
+    const return_internal_reference<> InternalRef;
+
+    class_<std::ostream, bases<>, std::ostream, boost::noncopyable>
+        ("std::ostream", no_init)
+        .def("write", &detail::write, InternalRef)
+        ;
 }
 
 } // namespace pysupport
