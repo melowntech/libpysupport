@@ -24,11 +24,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <boost/filesystem.hpp>
+
 #include <boost/python/dict.hpp>
 #include <boost/python/exec.hpp>
 #include <boost/python/import.hpp>
 
 #include "dbglog/dbglog.hpp"
+
+#include "utility/zip.hpp"
 
 #include "import.hpp"
 
@@ -38,16 +42,42 @@ namespace fs = boost::filesystem;
 
 namespace pysupport {
 
+namespace {
+
+enum ModuleType { other, zip, dir };
+
+ModuleType moduleType(const fs::path &path)
+{
+    if (fs::is_directory(path)) { return ModuleType::dir; }
+    if (utility::zip::Reader::check(path)) { return ModuleType::zip; }
+    return ModuleType::other;
+}
+
+} // namespace
+
 boost::python::object import(const fs::path &path)
 {
     using namespace boost::python;
 
+    auto type(moduleType(path));
+
     // get globals
-    object globals = boost::python::import("__main__").attr("__dict__");
+    auto globals(boost::python::import("__main__").attr("__dict__"));
 
     dict locals;
-    locals["name"] = path.stem().string();
-    locals["path"] = path.parent_path().string();
+    switch (type) {
+    case ModuleType::zip: locals["module_type"] = "zip"; break;
+    case ModuleType::dir: locals["module_type"] = "dir"; break;
+    case ModuleType::other: locals["module_type"] = object(); break;
+    }
+
+    if (type != ModuleType::other) {
+        locals["name"] = "__main__";
+        locals["path"] = path.string();
+    } else {
+        locals["name"] = path.stem().string();
+        locals["path"] = path.parent_path().string();
+    }
 
     str src(reinterpret_cast<const char*>(detail::import)
             , sizeof(detail::import));

@@ -2,7 +2,7 @@
 set(pysupport_VERSION 1.0)
 
 define_module(LIBRARY pysupport=${pysupport_VERSION}
-  DEPENDS utility Boost_PYTHON)
+  DEPENDS utility Boost_IOSTREAMS Boost_PYTHON)
 
 buildsys_compile_with_install_prefix()
 

@@ -22,21 +22,38 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This glue code used by pysupport/import.cpp
+# This glue code is used by pysupport/import.cpp
 #
-# Input: name, path
+# Input: name, path, module_type
 # Output: module
 # Throws: ImportError
 #
 
-import imp
+import sys
 import dbglog as log
 
-log.info1("Importing module {} from path \"{}\".", name, path)
-spec = imp.find_module(name, [path])
+log.info1("Importing module {}{} from path \"{}\"."
+          , name, "[{}]".format(module_type) if module_type is not None else ""
+          , path)
 
-try:
-    module = imp.load_module(name, *spec)
-finally:
-    if spec[0] is not None:
-        spec[0].close()
+if module_type is not None:
+    sys.path.insert(0, path)
+
+if module_type == "zip":
+    # ZIP archive
+    import zipimport
+
+    z = zipimport.zipimporter(path)
+    module = z.load_module(name)
+
+else:
+    # everything else
+    import imp
+    spec = imp.find_module(name, [path])
+
+    try:
+        module = imp.load_module(name, *spec)
+    finally:
+        if spec[0] is not None:
+            spec[0].close()
+
