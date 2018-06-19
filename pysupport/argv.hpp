@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include <boost/python.hpp>
@@ -63,6 +64,12 @@ inline void addArg(Argv &argv, const boost::filesystem::path &arg)
 inline void addArg(Argv &argv, const Argv &arg)
 {
     argv.insert(argv.end(), arg.begin(), arg.end());
+}
+
+template <typename T>
+inline void addArg(Argv &argv, const boost::optional<T> &arg)
+{
+    if (arg) { addArg(argv, *arg); }
 }
 
 inline void buildArgv(Argv&) {}

@@ -53,6 +53,29 @@ ModuleType moduleType(const fs::path &path)
     return ModuleType::other;
 }
 
+boost::python::object helper(ModuleType type, const std::string &path
+                             , const std::string &name)
+{
+    using namespace boost::python;
+
+    auto globals(boost::python::import("__main__").attr("__dict__"));
+    dict locals;
+    switch (type) {
+    case ModuleType::zip: locals["module_type"] = "zip"; break;
+    case ModuleType::dir: locals["module_type"] = "dir"; break;
+    case ModuleType::other: locals["module_type"] = object(); break;
+    }
+
+    locals["name"] = name;
+    locals["path"] = path;
+
+    str src(reinterpret_cast<const char*>(detail::import)
+            , sizeof(detail::import));
+
+    exec(src, globals, locals);
+    return locals["module"];
+}
+
 } // namespace
 
 boost::python::object import(const fs::path &path)
@@ -61,29 +84,11 @@ boost::python::object import(const fs::path &path)
 
     auto type(moduleType(path));
 
-    // get globals
-    auto globals(boost::python::import("__main__").attr("__dict__"));
-
-    dict locals;
-    switch (type) {
-    case ModuleType::zip: locals["module_type"] = "zip"; break;
-    case ModuleType::dir: locals["module_type"] = "dir"; break;
-    case ModuleType::other: locals["module_type"] = object(); break;
-    }
-
     if (type != ModuleType::other) {
-        locals["name"] = "__main__";
-        locals["path"] = path.string();
-    } else {
-        locals["name"] = path.stem().string();
-        locals["path"] = path.parent_path().string();
+        return helper(type, path.string(), "__main__");
     }
-
-    str src(reinterpret_cast<const char*>(detail::import)
-            , sizeof(detail::import));
-
-    exec(src, globals, locals);
-    return locals["module"];
+    return helper(type, path.parent_path().string()
+                  , path.stem().string());
 }
 
 } // namespace pysupport
