@@ -95,6 +95,12 @@ BOOST_PYTHON_MODULE(melown)
 
     PYSUPPORT_OPTIONAL(std::string);
     PYSUPPORT_OPTIONAL(fs::path);
+    PYSUPPORT_OPTIONAL(signed int);
+    PYSUPPORT_OPTIONAL(signed short);
+    PYSUPPORT_OPTIONAL(signed long);
+    PYSUPPORT_OPTIONAL(unsigned int);
+    PYSUPPORT_OPTIONAL(unsigned short);
+    PYSUPPORT_OPTIONAL(unsigned long);
 
     class_<std::vector<double>>("double_list")
         .def(vector_indexing_suite<std::vector<double>>())
