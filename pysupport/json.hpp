@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 Melown Technologies SE
+ * Copyright (c) 2019 Melown Technologies SE
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -24,18 +24,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string>
-#include <vector>
+#ifndef pysupport_json_hpp_included_
+#define pysupport_json_hpp_included_
 
-#include <boost/python/slice.hpp>
+#include <boost/python.hpp>
+
+#include "jsoncpp/json.hpp"
 
 namespace pysupport {
 
-/** Fill sys.argv with the content of provided vector.
- */
-void argv(const Argv &argv)
-{
-
-}
+Json::Value asJson(const boost::python::object &value);
 
 } // namespace pysupport
+
+#endif // pysupport_json_hpp_included_

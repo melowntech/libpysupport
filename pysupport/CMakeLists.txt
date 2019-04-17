@@ -1,8 +1,21 @@
 # bump version here
 set(pysupport_VERSION 1.0)
 
+set(pysupport_jsoncpp_SOURCES)
+set(pysupport_DEPENDS)
+
+if(MODULE_jsoncpp_FOUND)
+  message(STATUS "pysupport: compiling in jsoncpp support")
+
+  list(APPEND pysupport_DEPENDS jsoncpp)
+
+  set(pysupport_jsoncpp_SOURCES json.hpp json.cpp)
+else()
+  message(STATUS "pysupport: compiling without jsoncpp support")
+endif()
+
 define_module(LIBRARY pysupport=${pysupport_VERSION}
-  DEPENDS utility Boost_IOSTREAMS Boost_PYTHON)
+  DEPENDS ${pysupport_DEPENDS} utility Boost_IOSTREAMS Boost_PYTHON PYTHONLIBS)
 
 buildsys_compile_with_install_prefix()
 
@@ -27,9 +40,13 @@ set(pysupport_SOURCES
   formatexception.hpp formatexception.cpp
   package.hpp package.cpp
   argv.hpp argv.cpp
+
+  ${pysupport_jsoncpp_SOURCES}
   ${pysupport_PY_SOURCES}
 )
 
 add_library(pysupport ${pysupport_SOURCES})
 target_link_libraries(pysupport ${MODULE_LIBRARIES})
 buildsys_binary(pysupport)
+
+add_subdirectory(test EXCLUDE_FROM_ALL)
