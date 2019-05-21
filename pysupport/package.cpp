@@ -101,6 +101,8 @@ BOOST_PYTHON_MODULE(melown)
     PYSUPPORT_OPTIONAL(unsigned int);
     PYSUPPORT_OPTIONAL(unsigned short);
     PYSUPPORT_OPTIONAL(unsigned long);
+    PYSUPPORT_OPTIONAL(float);
+    PYSUPPORT_OPTIONAL(double);
 
     class_<std::vector<double>>("double_list")
         .def(vector_indexing_suite<std::vector<double>>())

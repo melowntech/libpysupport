@@ -62,9 +62,11 @@ Json::Value asJson(const bp::object &o)
     if (const auto &e = Extractor<double>(o)) { return e.get(); }
     // Python string/unicode string -> JSON string (UTF-8)
     if (Extractor<bp::str>(o)) { return py2utf8(o); }
+    // Python bool
+    if (const auto &e = Extractor<bool>(o)) { return e.get(); }
 
     // Python standard sequences -> JSON array
-    if (Extractor<bp::list>(o) || Extractor<bp::tuple>(o)) {
+    if (PySequence_Check(o.ptr())) {
         Json::Value out(Json::arrayValue);
         for (bp::stl_input_iterator<bp::object> io(o), eo; io != eo; ++io) {
             out.append(asJson(*io));
