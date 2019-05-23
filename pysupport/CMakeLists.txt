@@ -40,6 +40,7 @@ set(pysupport_SOURCES
   formatexception.hpp formatexception.cpp
   package.hpp package.cpp
   argv.hpp argv.cpp
+  threads.hpp
 
   ${pysupport_jsoncpp_SOURCES}
   ${pysupport_PY_SOURCES}
