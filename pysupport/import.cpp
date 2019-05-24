@@ -29,6 +29,7 @@
 #include <boost/python/dict.hpp>
 #include <boost/python/exec.hpp>
 #include <boost/python/import.hpp>
+#include <boost/python/stl_iterator.hpp>
 
 #include "dbglog/dbglog.hpp"
 
@@ -54,11 +55,18 @@ ModuleType moduleType(const fs::path &path)
 }
 
 boost::python::object helper(ModuleType type, const std::string &path
-                             , const std::string &name)
+                             , const std::string &name
+                             , const char *useName)
 {
     using namespace boost::python;
 
     auto globals(boost::python::import("__main__").attr("__dict__"));
+    // auto bi(boost::python::import("builtins"));
+    // object m(handle<>(PyModule_New("__importer")));
+    // PyModule_AddObject(m.ptr(), "__builtins__", bi.ptr());
+    // Py_INCREF(bi.ptr());
+    // auto globals(m.attr("__dict__"));
+
     dict locals;
     switch (type) {
     case ModuleType::zip: locals["module_type"] = "zip"; break;
@@ -67,28 +75,29 @@ boost::python::object helper(ModuleType type, const std::string &path
     }
 
     locals["name"] = name;
+    locals["useName"] = (useName ? useName : name.c_str());
     locals["path"] = path;
 
-    str src(reinterpret_cast<const char*>(detail::import)
-            , sizeof(detail::import));
+    {
+        str src(reinterpret_cast<const char*>(detail::import)
+                , sizeof(detail::import));
+        exec(src, globals, locals);
+    }
 
-    exec(src, globals, locals);
     return locals["module"];
 }
 
 } // namespace
 
-boost::python::object import(const fs::path &path)
+boost::python::object import(const fs::path &path, const char *useName)
 {
-    using namespace boost::python;
-
-    auto type(moduleType(path));
+    const auto type(moduleType(path));
 
     if (type != ModuleType::other) {
-        return helper(type, path.string(), "__main__");
+        return helper(type, path.string(), "__main__", useName);
     }
     return helper(type, path.parent_path().string()
-                  , path.stem().string());
+                  , path.stem().string(), useName);
 }
 
 } // namespace pysupport

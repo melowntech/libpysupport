@@ -34,7 +34,8 @@ namespace pysupport {
 
 /** Imports module from given path.
  */
-boost::python::object import(const boost::filesystem::path &path);
+boost::python::object import(const boost::filesystem::path &path
+                             , const char *useName = nullptr);
 
 } // namespace pysupport
 

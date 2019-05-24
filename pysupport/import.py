@@ -29,18 +29,7 @@
 # Throws: ImportError
 #
 
-from __future__ import print_function
 import sys
-
-try:
-    import dbglog as log
-    log.info1("Importing module {}{} from path \"{}\"."
-            , name, "[{}]".format(module_type) if module_type is not None else ""
-            , path)
-except ImportError:
-    print("No module dbglog found; add dbglog::py::import() to your code."
-          , file=sys.stderr)
-
 
 if module_type is not None:
     sys.path.insert(0, path)
@@ -58,8 +47,7 @@ else:
     spec = imp.find_module(name, [path])
 
     try:
-        module = imp.load_module(name, *spec)
+        module = imp.load_module(useName, *spec)
     finally:
         if spec[0] is not None:
             spec[0].close()
-
