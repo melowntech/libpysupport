@@ -24,36 +24,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef pysupport_threads_hpp_included_
-#define pysupport_threads_hpp_included_
+#ifndef pysupport_gc_hpp_included_
+#define pysupport_gc_hpp_included_
 
-#include <Python.h>
+#include <boost/python.hpp>
 
 namespace pysupport {
 
-/** RAII-styled scoped guard to enable threads, i.e. temporarily unlock GIL.
+/** Automatically breaks the wheel, er, cycles on scope exit.
  */
-class EnableThreads {
+class ScopedGarbageCollector {
 public:
-    EnableThreads() : state_(::PyEval_SaveThread()) {}
-    ~EnableThreads() { ::PyEval_RestoreThread(state_); }
+    ScopedGarbageCollector()
+        : collect_(boost::python::import("gc").attr("collect"))
+    {}
+
+    ~ScopedGarbageCollector() {
+        try {
+            collect_();
+        } catch (const boost::python::error_already_set&) {}
+    }
 
 private:
-    ::PyThreadState *state_;
-};
-
-/** RAII-styled scoped guard to temporarily request GIL.
- */
-class EnablePython {
-public:
-    EnablePython() : state_(::PyGILState_Ensure()) {}
-    ~EnablePython() { PyGILState_Release(state_); }
-
-private:
-    ::PyGILState_STATE state_;
+    boost::python::object collect_;
 };
 
 } // namespace pysupport
 
-#endif // pysupport_threads_hpp_included_
+#endif // pysupport_gc_hpp_included_
 

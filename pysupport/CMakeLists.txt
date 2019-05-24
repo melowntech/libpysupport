@@ -41,6 +41,7 @@ set(pysupport_SOURCES
   package.hpp package.cpp
   argv.hpp argv.cpp
   threads.hpp
+  gc.hpp
 
   ${pysupport_jsoncpp_SOURCES}
   ${pysupport_PY_SOURCES}
