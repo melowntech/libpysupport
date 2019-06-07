@@ -29,6 +29,7 @@
 
 #include <boost/python/slice.hpp>
 #include <boost/python/object_slices.hpp>
+#include <boost/python/stl_iterator.hpp>
 
 #include "dbglog/dbglog.hpp"
 
