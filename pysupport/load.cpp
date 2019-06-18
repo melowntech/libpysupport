@@ -26,6 +26,8 @@
 
 #include <string.h>
 
+#include <Python.h>
+
 #include <boost/python/dict.hpp>
 #include <boost/python/exec.hpp>
 #include <boost/python/import.hpp>
@@ -43,18 +45,24 @@ boost::python::object load(const std::string &name
                            , const void *data, std::size_t size)
 {
     using namespace boost::python;
-    // TODO: use Py_CompileStringFlags and PyImport_ExecCodeModuleEx
     // get globals
-    object globals = boost::python::import("__main__").attr("__dict__");
+    object globals(boost::python::import("__main__").attr("__dict__"));
 
     dict locals;
     locals["fullname"] = name;
     locals["contents"] = buffer(data, size);
     locals["compiled"] = true;
 
-    str code(reinterpret_cast<const char*>(detail::load)
-             , sizeof(detail::load));
-    exec(code, globals, locals);
+    {
+        std::string code(reinterpret_cast<const char*>(detail::load)
+                         , sizeof(detail::load));
+
+        auto result(::PyRun_StringFlags(code.c_str(), Py_file_input
+                                        , globals.ptr(), locals.ptr()
+                                        , nullptr));
+        if (!result) { throw_error_already_set(); }
+        Py_DECREF(result);
+    }
     return locals["module"];
 }
 

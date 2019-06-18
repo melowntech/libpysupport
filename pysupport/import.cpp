@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <Python.h>
+
 #include <boost/filesystem.hpp>
 
 #include <boost/python/dict.hpp>
@@ -60,7 +62,7 @@ boost::python::object helper(ModuleType type, const std::string &path
 {
     using namespace boost::python;
 
-    auto globals(boost::python::import("__main__").attr("__dict__"));
+    object globals(boost::python::import("__main__").attr("__dict__"));
     // auto bi(boost::python::import("builtins"));
     // object m(handle<>(PyModule_New("__importer")));
     // PyModule_AddObject(m.ptr(), "__builtins__", bi.ptr());
@@ -79,9 +81,13 @@ boost::python::object helper(ModuleType type, const std::string &path
     locals["path"] = path;
 
     {
-        str src(reinterpret_cast<const char*>(detail::import)
-                , sizeof(detail::import));
-        exec(src, globals, locals);
+        std::string code(reinterpret_cast<const char*>(detail::import)
+                         , sizeof(detail::import));
+        auto result(::PyRun_StringFlags(code.c_str(), Py_file_input
+                                        , globals.ptr(), locals.ptr()
+                                        , nullptr));
+        if (!result) { throw_error_already_set(); }
+        Py_DECREF(result);
     }
 
     return locals["module"];
