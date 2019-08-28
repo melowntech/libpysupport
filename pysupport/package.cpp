@@ -107,6 +107,10 @@ BOOST_PYTHON_MODULE(melown)
     class_<std::vector<double>>("double_list")
         .def(vector_indexing_suite<std::vector<double>>())
         ;
+
+    class_<std::vector<std::string>>("string_list")
+        .def(vector_indexing_suite<std::vector<std::string>>())
+        ;
 }
 
 namespace pysupport {
