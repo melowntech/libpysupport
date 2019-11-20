@@ -35,9 +35,10 @@
 
 #include "dbglog/dbglog.hpp"
 
-#include "./package.hpp"
-#include "./converters.hpp"
-#include "./iostreams.hpp"
+#include "package.hpp"
+#include "converters.hpp"
+#include "iostreams.hpp"
+#include "array.hpp"
 
 namespace bp = boost::python;
 namespace fs = boost::filesystem;
@@ -104,13 +105,24 @@ BOOST_PYTHON_MODULE(melown)
     PYSUPPORT_OPTIONAL(float);
     PYSUPPORT_OPTIONAL(double);
 
-    class_<std::vector<double>>("double_list")
+    class_<std::vector<double>>("std::vector<double>")
         .def(vector_indexing_suite<std::vector<double>>())
         ;
 
-    class_<std::vector<std::string>>("string_list")
+    class_<std::vector<std::string>>("std::vector<std::string>")
         .def(vector_indexing_suite<std::vector<std::string>>())
         ;
+
+#define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                          \
+    class_<std::array<T, N>>("std::array<" #T ", " #N ">")          \
+        .def(pysupport::array_indexing_suite<std::array<T, N>>())
+
+    PYSUPPORT_REGISTER_STD_ARRAY(double, 2);
+    PYSUPPORT_REGISTER_STD_ARRAY(double, 3);
+    PYSUPPORT_REGISTER_STD_ARRAY(double, 4);
+    PYSUPPORT_REGISTER_STD_ARRAY(double, 5);
+
+#undef PYSUPPORT_REGISTER_STD_ARRAY
 }
 
 namespace pysupport {
