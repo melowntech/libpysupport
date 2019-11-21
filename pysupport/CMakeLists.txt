@@ -1,5 +1,5 @@
 # bump version here
-set(pysupport_VERSION 1.1)
+set(pysupport_VERSION 1.2)
 
 set(pysupport_jsoncpp_SOURCES)
 set(pysupport_DEPENDS)
@@ -42,6 +42,8 @@ set(pysupport_SOURCES
   argv.hpp argv.cpp
   threads.hpp
   gc.hpp
+  variant.hpp
+  initialize.hpp initialize.cpp
 
   ${pysupport_jsoncpp_SOURCES}
   ${pysupport_PY_SOURCES}

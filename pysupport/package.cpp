@@ -105,16 +105,16 @@ BOOST_PYTHON_MODULE(melown)
     PYSUPPORT_OPTIONAL(float);
     PYSUPPORT_OPTIONAL(double);
 
-    class_<std::vector<double>>("std::vector<double>")
+    class_<std::vector<double>>("double_list")
         .def(vector_indexing_suite<std::vector<double>>())
         ;
 
-    class_<std::vector<std::string>>("std::vector<std::string>")
+    class_<std::vector<std::string>>("string_list>")
         .def(vector_indexing_suite<std::vector<std::string>>())
         ;
 
 #define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                          \
-    class_<std::array<T, N>>("std::array<" #T ", " #N ">")          \
+    class_<std::array<T, N>>(#T #N  "_array")                      \
         .def(pysupport::array_indexing_suite<std::array<T, N>>())
 
     PYSUPPORT_REGISTER_STD_ARRAY(double, 2);

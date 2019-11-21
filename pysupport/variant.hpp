@@ -24,47 +24,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef pysupport_variant_hpp_included_
+#define pysupport_variant_hpp_included_
+
+#include <utility>
+
+#include <boost/variant.hpp>
 #include <boost/python.hpp>
-
-#include "dbglog/dbglog.hpp"
-
-#include "systemexit.hpp"
-#include "hasattr.hpp"
-
-namespace bp = boost::python;
 
 namespace pysupport {
 
-boost::optional<int> getSystemExit()
+namespace detail {
+
+template<typename Variant>
+struct variant_to_object : boost::static_visitor<PyObject *> {
+    static result_type convert(const Variant &v) {
+        return boost::apply_visitor(variant_to_object(), v);
+    }
+
+    template<typename T>
+    result_type operator()(const T &t) const {
+        return boost::python::incref(boost::python::object(t).ptr());
+    }
+};
+
+template <typename ...Types>
+void makeConvertible(const boost::variant<Types...>*)
 {
-    if (!::PyErr_ExceptionMatches(::PyExc_SystemExit)) {
-        return boost::none;
-    }
+    // TODO: implement me
+}
 
-    // system exit -> get exception and extract code
-    ::PyObject *rawType(nullptr);
-    ::PyObject *rawValue(nullptr);
-    ::PyObject *rawTraceback(nullptr);
-    ::PyErr_Fetch(&rawType, &rawValue, &rawTraceback);
-    ::PyErr_NormalizeException(&rawType, &rawValue, &rawTraceback);
+} // namespace detail
 
-    if (!rawValue) { return EXIT_FAILURE; }
-
-    bp::handle<> type(rawType);
-    bp::handle<> value(bp::allow_null(rawValue));
-    bp::handle<> traceback(bp::allow_null(rawTraceback));
-
-    bp::object v(value);
-    if (!hasattr(v, "code")) { return EXIT_FAILURE; }
-    bp::object code(v.attr("code"));
-
-    if (code.ptr() == Py_None) { return EXIT_SUCCESS; }
-
-    if (!PyLong_Check(code.ptr())) {
-        return EXIT_FAILURE;
-    }
-
-    return boost::optional<int>(bp::extract<int>(code));
+template <typename Variant>
+void registerVariant()
+{
+    boost::python::to_python_converter
+        <Variant, detail::variant_to_object<Variant>>();
+    detail::makeConvertible(static_cast<const Variant*>(nullptr));
 }
 
 } // namespace pysupport
+
+#endif // pysupport_variant_hpp_included_

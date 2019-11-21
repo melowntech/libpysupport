@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 Melown Technologies SE
+ * Copyright (c) 2019 Melown Technologies SE
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,45 +26,48 @@
 
 #include <boost/python.hpp>
 
-#include "dbglog/dbglog.hpp"
-
-#include "systemexit.hpp"
-#include "hasattr.hpp"
+#include "initialize.hpp"
 
 namespace bp = boost::python;
 
 namespace pysupport {
 
-boost::optional<int> getSystemExit()
+namespace {
+
+bp::object sys_module;
+
+void cleanup()
 {
-    if (!::PyErr_ExceptionMatches(::PyExc_SystemExit)) {
-        return boost::none;
+    if (sys_module) {
+        // flush python streams
+        try {
+            sys_module.attr("stdout").attr("flush")();
+            sys_module.attr("stderr").attr("flush")();
+        } catch (...) {}
     }
 
-    // system exit -> get exception and extract code
-    ::PyObject *rawType(nullptr);
-    ::PyObject *rawValue(nullptr);
-    ::PyObject *rawTraceback(nullptr);
-    ::PyErr_Fetch(&rawType, &rawValue, &rawTraceback);
-    ::PyErr_NormalizeException(&rawType, &rawValue, &rawTraceback);
+    ::fflush(stdout);
+    ::fflush(stderr);
+}
 
-    if (!rawValue) { return EXIT_FAILURE; }
+} // namespace
 
-    bp::handle<> type(rawType);
-    bp::handle<> value(bp::allow_null(rawValue));
-    bp::handle<> traceback(bp::allow_null(rawTraceback));
+void initialize(bool registerAtExit)
+{
+    // Initialize python interpreter
+    ::Py_Initialize();
 
-    bp::object v(value);
-    if (!hasattr(v, "code")) { return EXIT_FAILURE; }
-    bp::object code(v.attr("code"));
+    if (!registerAtExit) { return; }
 
-    if (code.ptr() == Py_None) { return EXIT_SUCCESS; }
 
-    if (!PyLong_Check(code.ptr())) {
-        return EXIT_FAILURE;
-    }
+    // since we cannot call Py_Finalize (c'mon Boost.Python...) we need to
+    // have our own at exit handler
 
-    return boost::optional<int>(bp::extract<int>(code));
+    try {
+        sys_module = bp::import("sys");
+    } catch (...) {}
+
+    std::atexit(cleanup);
 }
 
 } // namespace pysupport
