@@ -35,9 +35,17 @@ namespace pysupport {
 namespace {
 
 bp::object sys_module;
+bp::object atexit_module;
 
 void cleanup()
 {
+    if (atexit_module) {
+        // try to run atexit handlers since we do not finalize
+        try {
+            atexit_module.attr("_run_exitfuncs")();
+        } catch (...) {}
+    }
+
     if (sys_module) {
         // flush python streams
         try {
@@ -65,6 +73,10 @@ void initialize(bool registerAtExit)
 
     try {
         sys_module = bp::import("sys");
+    } catch (...) {}
+
+    try {
+        atexit_module = bp::import("atexit");
     } catch (...) {}
 
     std::atexit(cleanup);
