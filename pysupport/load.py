@@ -29,6 +29,20 @@
 # Throws: ImportError
 #
 
+import sys
+version = sys.version_info[0] * 100 + sys.version_info[1]
+
+if version < 307:
+    def new_module(fullname):
+        import imp
+        imp.new_module(fullname)
+else:
+    def new_module(fullname):
+        import importlib.util
+        import importlib.machinery
+        spec = importlib.machinery.ModuleSpec(fullname, None)
+        return importlib.util.module_from_spec(spec)
+
 class Loader:
     def __init__(self, fullname, contents, compiled=False):
         self.fullname = fullname
@@ -36,19 +50,25 @@ class Loader:
         self.compiled = compiled
 
     def load_module(self, fullname):
+        import sys
+        global new_module, version
+
         # this must be here
-        import sys, imp
         if fullname in sys.modules:
             return sys.modules[fullname]
 
-        mod = sys.modules.setdefault(fullname, imp.new_module(fullname))
+        mod = sys.modules.setdefault(fullname, new_module(fullname))
         mod.__file__ = "<%s>" % fullname
         mod.__loader__ = self
 
         if self.compiled:
             import marshal
             # TODO: use buffer slice
-            offset = 8 if (sys.version_info[0] < 3) else 12
+            offset = 8;
+            if version >= 300:
+                offset += 4
+            if version >= 307:
+                offset += 4
             code = marshal.loads(self.contents[offset:])
         else:
             code = compile(self.contents, mod.__file__, "exec")
