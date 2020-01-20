@@ -35,7 +35,7 @@ version = sys.version_info[0] * 100 + sys.version_info[1]
 if version < 307:
     def new_module(fullname):
         import imp
-        imp.new_module(fullname)
+        return imp.new_module(fullname)
 else:
     def new_module(fullname):
         import importlib.util
