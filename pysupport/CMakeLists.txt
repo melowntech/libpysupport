@@ -51,6 +51,6 @@ set(pysupport_SOURCES
 
 add_library(pysupport ${pysupport_SOURCES})
 target_link_libraries(pysupport ${MODULE_LIBRARIES})
-buildsys_binary(pysupport)
+buildsys_library(pysupport)
 
 add_subdirectory(test EXCLUDE_FROM_ALL)
