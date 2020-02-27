@@ -99,9 +99,11 @@ BOOST_PYTHON_MODULE(melown)
     PYSUPPORT_OPTIONAL(signed int);
     PYSUPPORT_OPTIONAL(signed short);
     PYSUPPORT_OPTIONAL(signed long);
+    PYSUPPORT_OPTIONAL(signed long long);
     PYSUPPORT_OPTIONAL(unsigned int);
     PYSUPPORT_OPTIONAL(unsigned short);
     PYSUPPORT_OPTIONAL(unsigned long);
+    PYSUPPORT_OPTIONAL(unsigned long long);
     PYSUPPORT_OPTIONAL(float);
     PYSUPPORT_OPTIONAL(double);
 
