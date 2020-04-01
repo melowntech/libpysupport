@@ -49,7 +49,7 @@ set(pysupport_SOURCES
   ${pysupport_PY_SOURCES}
 )
 
-add_library(pysupport ${pysupport_SOURCES})
+add_library(pysupport STATIC ${pysupport_SOURCES})
 target_link_libraries(pysupport ${MODULE_LIBRARIES})
 buildsys_library(pysupport)
 
