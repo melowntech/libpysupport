@@ -1,7 +1,7 @@
 #include <boost/iostreams/filtering_stream.hpp>
 
-#include "./iostreams.hpp"
-#include "./hasattr.hpp"
+#include "iostreams.hpp"
+#include "hasattr.hpp"
 
 namespace bp = boost::python;
 namespace bi = boost::iostreams;

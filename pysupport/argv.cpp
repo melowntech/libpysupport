@@ -30,9 +30,9 @@
 #include <boost/python/slice.hpp>
 #include <boost/python/object_slices.hpp>
 
-#include "./argv.hpp"
-#include "./hasattr.hpp"
-#include "./setattr.hpp"
+#include "argv.hpp"
+#include "hasattr.hpp"
+#include "setattr.hpp"
 
 namespace bp = boost::python;
 

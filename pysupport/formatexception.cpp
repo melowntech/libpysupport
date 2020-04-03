@@ -31,9 +31,9 @@
 
 #include "dbglog/dbglog.hpp"
 
-#include "./string.hpp"
-#include "./load.hpp"
-#include "./formatexception.hpp"
+#include "string.hpp"
+#include "load.hpp"
+#include "formatexception.hpp"
 
 #include "formatexception.py.pyc.hpp"
 

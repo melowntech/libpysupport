@@ -32,7 +32,7 @@
 
 #include <boost/python.hpp>
 
-#include "./iostreams.hpp"
+#include "iostreams.hpp"
 
 namespace pysupport {
 

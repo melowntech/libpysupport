@@ -24,7 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "./repr.hpp"
+#include "repr.hpp"
 
 namespace bp = boost::python;
 
