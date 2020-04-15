@@ -45,6 +45,8 @@ set(pysupport_SOURCES
   variant.hpp
   initialize.hpp initialize.cpp
 
+  profiler.hpp profiler.cpp
+
   ${pysupport_jsoncpp_SOURCES}
   ${pysupport_PY_SOURCES}
 )
