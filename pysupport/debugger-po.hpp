@@ -24,68 +24,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef pysupport_profiler_po_hpp_included_
-#define pysupport_profiler_po_hpp_included_
+#ifndef pysupport_debugger_po_hpp_included_
+#define pysupport_debugger_po_hpp_included_
 
 #include <boost/program_options.hpp>
 
-#include "utility/streams.hpp"
+#include "utility/implicit-value.hpp"
 
-#include "profiler.hpp"
+#include "debugger.hpp"
 
 namespace pysupport {
 
-inline void configuration(ProfilerOptions &options
+inline void configuration(DebuggerOptions &options
                           , boost::program_options::options_description &od)
 {
     namespace po = boost::program_options;
 
     od.add_options()
-        ("profile"
-         , po::value<ProfilerModule>()
-         ->implicit_value(ProfilerModule::cProfile)
-         , utility::concat
-         ("Profiler to use. Profiler is inactive if unset (default); one of "
-          , enumerationString(ProfilerModule())
-          , ".").c_str())
-
-        ("profile.stats.print"
-         , po::value(&options.printStats)->default_value(true)
-         , "Print profiling statistics to output.")
-
-        ("profile.stats.print.sort"
-         , po::value<ProfilerSort>()
-         , utility::concat
-         ("Sorting order of printer profiling statistics; one of "
-          , enumerationString(ProfilerSort())
-          , ".").c_str())
-
-        ("profile.stats.save"
-         , po::value<boost::filesystem::path>()
-         , "Write profiling statistics to given file.")
+        ("debug"
+         , utility::implicit_value(&options.enable, true)
+         , "Enable debugger (pdb).")
         ;
 }
 
-inline void configure(ProfilerOptions &options
+inline void configure(DebuggerOptions &options
                       , const boost::program_options::variables_map &vars)
 {
     namespace po = boost::program_options;
-
-    if (!vars.count("profile")) { return; }
-
-    options.module = vars["profile"].as<ProfilerModule>();
-
-    if (vars.count("profile.stats.print.sort")) {
-        options.printStatsSort = vars["profile.stats.print.sort"]
-            .as<ProfilerSort>();
-    }
-
-    if (vars.count("profile.stats.save")) {
-        options.saveStats
-            = vars["profile.stats.save"].as<boost::filesystem::path>();
-    }
+    (void) options;
+    (void) vars;
 }
 
 } // namespace pysupport
 
-#endif // pysupport_profiler_po_hpp_included_
+#endif // pysupport_debugger_po_hpp_included_
