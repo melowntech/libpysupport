@@ -40,7 +40,7 @@ namespace pysupport {
 
 bp::object createDebugger(const DebuggerOptions &options)
 {
-    if (!options.enable) { return {}; }
+    if (!options.mode) { return {}; }
 
     return bp::import("pdb");
 }
@@ -48,9 +48,25 @@ bp::object createDebugger(const DebuggerOptions &options)
 Debugger::Debugger(const DebuggerOptions &options)
     : options_(options), module_(createDebugger(options))
 {
-    if (module_) {
-        runcall_ = module_.attr("runcall");
+    if (options_.mode) {
+        switch (*options_.mode) {
+        case DebuggerMode::interactive:
+            runcall_ = module_.attr("runcall");
+            break;
+
+        case DebuggerMode::postMortem:
+            pm_ = module_.attr("post_mortem");
+            break;
+        }
     }
+}
+
+void Debugger::pm(const boost::python::object &traceback)
+{
+    if (!pm_) { return; }
+    LOG(info3) << "Starting post-mortem debugger...";
+    pm_(traceback);
+    LOG(info3) << "Post-mortem debugger finished.";
 }
 
 } // namespace pysupport

@@ -47,7 +47,7 @@ boost::python::object formatter;
 
 } // namespace detail
 
-std::string formatCurrentException()
+std::string formatCurrentException(boost::python::object *outTraceback)
 {
     namespace py = boost::python;
     try {
@@ -71,6 +71,7 @@ std::string formatCurrentException()
                        , detail::formatexception).attr("format");
         });
 
+        if (outTraceback) { *outTraceback = boost::python::object(traceback); }
         return py2utf8(detail::formatter(type, value, traceback));
     } catch (const boost::python::error_already_set&) {
         ::PyErr_Print();

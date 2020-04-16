@@ -35,13 +35,15 @@
 
 namespace pysupport {
 
+UTILITY_GENERATE_ENUM(DebuggerMode,
+                      ((interactive))
+                      ((postMortem)("post-mortem")("pm"))
+                      )
 
 struct DebuggerOptions {
-    bool enable;
+    boost::optional<DebuggerMode> mode;
 
-    DebuggerOptions()
-        : enable(false)
-    {}
+    DebuggerOptions() {}
 };
 
 class Debugger {
@@ -57,6 +59,7 @@ public:
             options_ = p.options_;
             std::swap(module_, p.module_);
             std::swap(runcall_, p.runcall_);
+            std::swap(pm_, p.pm_);
         }
         return *this;
     }
@@ -64,7 +67,11 @@ public:
     Debugger(const Debugger&) = delete;
     Debugger& operator=(const Debugger&) = delete;
 
-    operator bool() const { return module_; }
+    operator bool() const { return bool(options_.mode); }
+
+    bool interactive() const { return runcall_; }
+
+    bool postMortem() const { return pm_; }
 
     /** Calls runnable(args). Skips debugging if not configured
      */
@@ -78,12 +85,14 @@ public:
         return runnable(std::forward<Args>(args)...);
     }
 
+    void pm(const boost::python::object &traceback);
+
 private:
     DebuggerOptions options_;
     boost::python::object module_;
     boost::python::object runcall_;
+    boost::python::object pm_;
 };
-
 
 } // namespace pysupport
 

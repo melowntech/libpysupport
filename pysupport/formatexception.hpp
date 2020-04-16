@@ -33,7 +33,7 @@
 
 namespace pysupport {
 
-std::string formatCurrentException();
+std::string formatCurrentException(boost::python::object *traceback = nullptr);
 
 } // namespace pysupport
 

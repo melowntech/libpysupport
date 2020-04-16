@@ -42,17 +42,24 @@ inline void configuration(DebuggerOptions &options
 
     od.add_options()
         ("debug"
-         , utility::implicit_value(&options.enable, true)
-         , "Enable debugger (pdb).")
+         , po::value<DebuggerMode>()
+         ->implicit_value(DebuggerMode::interactive)
+         , "Debugging mode. Default off. Use \"interactive\" (implicit) to "
+         "start interactive debugger. Use \"post-mortem\" or \"pm\" to "
+         "start interactive debugger on uncaught exception.")
         ;
+
+    (void) options;
 }
 
 inline void configure(DebuggerOptions &options
                       , const boost::program_options::variables_map &vars)
 {
     namespace po = boost::program_options;
-    (void) options;
-    (void) vars;
+
+    if (!vars.count("debug")) { return; }
+
+    options.mode = vars["debug"].as<DebuggerMode>();
 }
 
 } // namespace pysupport
