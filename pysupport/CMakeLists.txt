@@ -15,7 +15,8 @@ else()
 endif()
 
 define_module(LIBRARY pysupport=${pysupport_VERSION}
-  DEPENDS ${pysupport_DEPENDS} utility Boost_IOSTREAMS Boost_PYTHON PYTHONLIBS)
+  DEPENDS ${pysupport_DEPENDS} utility dbglog>=1.5
+  Boost_IOSTREAMS Boost_PYTHON PYTHONLIBS)
 
 buildsys_compile_with_install_prefix()
 

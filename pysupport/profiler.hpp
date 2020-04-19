@@ -61,13 +61,19 @@ UTILITY_GENERATE_ENUM(ProfilerSort,
 struct ProfilerOptions {
     boost::optional<ProfilerModule> module;
 
+    bool builtins;
+    double timeunit;
+
     bool printStats;
     boost::optional<ProfilerSort> printStatsSort;
 
     boost::optional<boost::filesystem::path> saveStats;
 
+    bool hookMultiprocessing;
+
     ProfilerOptions()
-        : printStats(true)
+        : builtins(true), timeunit(0.0)
+        , printStats(true), hookMultiprocessing(true)
     {}
 };
 
@@ -84,6 +90,7 @@ public:
             options_ = p.options_;
             std::swap(profiler_, p.profiler_);
             std::swap(runcall_, p.runcall_);
+            std::swap(detail_, p.detail_);
         }
         return *this;
     }
@@ -107,10 +114,16 @@ public:
 
     void stats();
 
+    const ProfilerOptions& options() const { return options_; }
+
+    struct Detail;
+
 private:
     ProfilerOptions options_;
     boost::python::object profiler_;
     boost::python::object runcall_;
+
+    std::shared_ptr<Detail> detail_;
 };
 
 

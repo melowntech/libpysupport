@@ -49,6 +49,14 @@ inline void configuration(ProfilerOptions &options
           , enumerationString(ProfilerModule())
           , ".").c_str())
 
+        ("profile.builtins"
+         , po::value(&options.builtins)->default_value(true)
+         , "Profile built-in functions.")
+
+        ("profile.timeunit"
+         , po::value(&options.timeunit)->default_value(options.timeunit)
+         , "Time multipler. Defaults to no multiplier.")
+
         ("profile.stats.print"
          , po::value(&options.printStats)->default_value(true)
          , "Print profiling statistics to output.")
@@ -63,6 +71,11 @@ inline void configuration(ProfilerOptions &options
         ("profile.stats.save"
          , po::value<boost::filesystem::path>()
          , "Write profiling statistics to given file.")
+
+        ("profile.hook.multiprocessing"
+         , po::value(&options.hookMultiprocessing)
+         ->default_value(options.hookMultiprocessing)
+         , "Add hook to multiprocessing.Process machinery.")
         ;
 }
 
