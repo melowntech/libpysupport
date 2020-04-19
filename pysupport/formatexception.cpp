@@ -71,8 +71,13 @@ std::string formatCurrentException(boost::python::object *outTraceback)
                        , detail::formatexception).attr("format");
         });
 
-        if (outTraceback) { *outTraceback = boost::python::object(traceback); }
-        return py2utf8(detail::formatter(type, value, traceback));
+        if (outTraceback && traceback) {
+            *outTraceback = py::object(traceback);
+        }
+        auto res(traceback
+                 ? detail::formatter(type, value, traceback)
+                 : detail::formatter(type, value, py::object()));
+        return py2utf8(res);
     } catch (const boost::python::error_already_set&) {
         ::PyErr_Print();
     }
