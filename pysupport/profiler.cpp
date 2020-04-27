@@ -81,13 +81,10 @@ public:
 
 void Process_run(const bp::object &self)
 {
-    LOG(info4) << "Before run";
-
     bp::object pyDetail(self.attr("_profiler_detail"));
     auto detail = bp::extract<Profiler::Detail::pointer>(pyDetail)();
 
     mp_Process.attr("_profiler_run")(self);
-    LOG(info4) << "After run";
     detail->stats(true);
 }
 
@@ -119,7 +116,6 @@ Profiler::Detail::init(const ProfilerOptions &options
 
     if (options.hookMultiprocessing) {
         initMultiprocessingHook(detail);
-        LOG(info4) << "Process";
     }
     return detail;
 }

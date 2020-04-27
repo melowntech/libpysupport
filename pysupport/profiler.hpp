@@ -75,6 +75,8 @@ struct ProfilerOptions {
         : builtins(true), timeunit(0.0)
         , printStats(true), hookMultiprocessing(true)
     {}
+
+    operator bool() const { return bool(module); }
 };
 
 class Profiler {
@@ -111,6 +113,8 @@ public:
         }
         return runnable(std::forward<Args>(args)...);
     }
+
+    boost::python::object runcall() const { return runcall_; }
 
     void stats();
 

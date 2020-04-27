@@ -61,12 +61,17 @@ Debugger::Debugger(const DebuggerOptions &options)
     }
 }
 
-void Debugger::pm(const boost::python::object &traceback)
+void Debugger::pm(const boost::python::object &traceback
+                  , std::ostream *log)
 {
     if (!pm_) { return; }
-    LOG(info3) << "Starting post-mortem debugger...";
+    if (log) { *log << "Starting post-mortem debugger..." << std::endl; }
+    else { LOG(info3) << "Starting post-mortem debugger..."; }
+
     pm_(traceback);
-    LOG(info3) << "Post-mortem debugger finished.";
+
+    if (log) { *log << "Post-mortem debugger finished." << std::endl; }
+    else { LOG(info3) << "Post-mortem debugger finished."; }
 }
 
 } // namespace pysupport

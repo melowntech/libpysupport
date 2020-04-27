@@ -58,7 +58,8 @@ ModuleType moduleType(const fs::path &path)
 
 boost::python::object helper(ModuleType type, const std::string &path
                              , const std::string &name
-                             , const char *useName)
+                             , const char *useName
+                             , const boost::python::object &wrapper)
 {
     using namespace boost::python;
 
@@ -79,6 +80,7 @@ boost::python::object helper(ModuleType type, const std::string &path
     locals["name"] = name;
     locals["useName"] = (useName ? useName : name.c_str());
     locals["path"] = path;
+    locals["wrapper"] = wrapper;
 
     {
         std::string code(reinterpret_cast<const char*>(detail::import)
@@ -95,15 +97,16 @@ boost::python::object helper(ModuleType type, const std::string &path
 
 } // namespace
 
-boost::python::object import(const fs::path &path, const char *useName)
+boost::python::object import(const fs::path &path, const char *useName
+                             , const boost::python::object &wrapper)
 {
     const auto type(moduleType(path));
 
     if (type != ModuleType::other) {
-        return helper(type, path.string(), "__main__", useName);
+        return helper(type, path.string(), "__main__", useName, wrapper);
     }
     return helper(type, path.parent_path().string()
-                  , path.stem().string(), useName);
+                  , path.stem().string(), useName, wrapper);
 }
 
 } // namespace pysupport

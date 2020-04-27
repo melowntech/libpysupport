@@ -44,6 +44,8 @@ struct DebuggerOptions {
     boost::optional<DebuggerMode> mode;
 
     DebuggerOptions() {}
+
+    operator bool() const { return bool(mode); }
 };
 
 class Debugger {
@@ -85,7 +87,10 @@ public:
         return runnable(std::forward<Args>(args)...);
     }
 
-    void pm(const boost::python::object &traceback);
+    boost::python::object runcall() const { return runcall_; }
+
+    void pm(const boost::python::object &traceback
+            , std::ostream *log = nullptr);
 
 private:
     DebuggerOptions options_;

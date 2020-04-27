@@ -34,12 +34,17 @@ import sys
 if module_type is not None:
     sys.path.insert(0, path)
 
+def wrap(wrapper, func, *args, **kwargs):
+    if callable(wrapper):
+        return wrapper(func, *args, **kwargs)
+    return func(*args, **kwargs)
+
 if module_type == "zip":
     # ZIP archive
     import zipimport
 
     z = zipimport.zipimporter(path)
-    module = z.load_module(name)
+    module = wrap(wrapper, z.load_module, name)
 
 else:
     # everything else
@@ -47,7 +52,7 @@ else:
     spec = imp.find_module(name, [path])
 
     try:
-        module = imp.load_module(useName, *spec)
+        module = wrap(wrapper, imp.load_module, useName, *spec)
     finally:
         if spec[0] is not None:
             spec[0].close()
