@@ -30,6 +30,8 @@
 #include <boost/python/slice.hpp>
 #include <boost/python/object_slices.hpp>
 
+#include "dbglog/dbglog.hpp"
+
 #include "argv.hpp"
 #include "hasattr.hpp"
 #include "setattr.hpp"
@@ -42,20 +44,13 @@ namespace pysupport { namespace detail {
  */
 void argvImpl(const Argv &argv)
 {
+    // create new argv vector, replacing original
     auto sys(bp::import("sys"));
     bp::list sys_argv;
-    if (hasattr(sys, "argv")) {
-        // get and clear
-        sys_argv = bp::list(sys.attr("argv"));
-        del(sys_argv[bp::slice()]);
-    } else {
-        // inject new
-        setattr(sys, "argv", sys_argv);
-    }
-
     for (const auto arg : argv) {
         sys_argv.append(bp::str(arg));
     }
+    setattr(sys, "argv", sys_argv);
 }
 
 } } // namespace pysupport::detail
