@@ -84,6 +84,11 @@ struct from_python_path
     }
 };
 
+fs::path asPath(const std::string &path)
+{
+    return fs::path(path);
+}
+
 } // namespace pysupport
 
 BOOST_PYTHON_MODULE(melown)
@@ -115,7 +120,9 @@ BOOST_PYTHON_MODULE(melown)
         .def(vector_indexing_suite<std::vector<std::string>>())
         ;
 
-#define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                          \
+    def("path", &pysupport::asPath);
+
+#define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                         \
     class_<std::array<T, N>>(#T #N  "_array")                      \
         .def(pysupport::array_indexing_suite<std::array<T, N>>())
 
