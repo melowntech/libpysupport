@@ -34,25 +34,24 @@ namespace pysupport {
 
 namespace {
 
-bp::object sys_module;
-bp::object atexit_module;
-
-void cleanup()
+void initialize()
 {
-    if (atexit_module) {
-        // try to run atexit handlers since we do not finalize
-        try {
-            atexit_module.attr("_run_exitfuncs")();
-        } catch (...) {}
-    }
+    // Initialize python interpreter
+    ::Py_Initialize();
+}
 
-    if (sys_module) {
-        // flush python streams
-        try {
-            sys_module.attr("stdout").attr("flush")();
-            sys_module.attr("stderr").attr("flush")();
-        } catch (...) {}
-    }
+void finalize()
+{
+    try {
+        auto atexit( bp::import("atexit"));
+        atexit.attr("_run_exitfuncs")();
+    } catch (...) {}
+
+    try {
+        auto sys(bp::import("sys"));
+        sys.attr("stdout").attr("flush")();
+        sys.attr("stderr").attr("flush")();
+    } catch (...) {}
 
     ::fflush(stdout);
     ::fflush(stderr);
@@ -60,26 +59,13 @@ void cleanup()
 
 } // namespace
 
-void initialize(bool registerAtExit)
+ScopedInterpreter::ScopedInterpreter()
 {
-    // Initialize python interpreter
-    ::Py_Initialize();
+    initialize();
+}
 
-    if (!registerAtExit) { return; }
-
-
-    // since we cannot call Py_Finalize (c'mon Boost.Python...) we need to
-    // have our own at exit handler
-
-    try {
-        sys_module = bp::import("sys");
-    } catch (...) {}
-
-    try {
-        atexit_module = bp::import("atexit");
-    } catch (...) {}
-
-    std::atexit(cleanup);
+ScopedInterpreter::~ScopedInterpreter() {
+    try { finalize(); } catch (...) {}
 }
 
 } // namespace pysupport

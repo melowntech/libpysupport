@@ -29,10 +29,15 @@
 
 namespace pysupport {
 
-/** Initialized Python interpretter and (if not disabled) registeres at-exit
- *  handler for cleanup.
+/** Initializes and de-initializes python interpreter.
+ *
+ *  Finalization is done manually because Boost.Python crahes when Py_Finalize()
+ *  is called.
  */
-void initialize(bool registerAtExit = true);
+struct ScopedInterpreter {
+    ScopedInterpreter();
+    ~ScopedInterpreter();
+};
 
 } // namespace pysupport
 
