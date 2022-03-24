@@ -89,6 +89,12 @@ fs::path asPath(const std::string &path)
     return fs::path(path);
 }
 
+void packageCallback(bp::object package) __attribute__ ((weak));
+
+void packageCallback(bp::object package) {
+    (void) package;
+}
+
 } // namespace pysupport
 
 BOOST_PYTHON_MODULE(melown)
@@ -122,8 +128,8 @@ BOOST_PYTHON_MODULE(melown)
 
     def("path", &pysupport::asPath);
 
-#define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                         \
-    class_<std::array<T, N>>(#T #N  "_array")                      \
+#define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                              \
+    class_<std::array<T, N>>(#T #N  "_array")                           \
         .def(pysupport::array_indexing_suite<std::array<T, N>>())
 
     PYSUPPORT_REGISTER_STD_ARRAY(double, 2);
@@ -132,6 +138,11 @@ BOOST_PYTHON_MODULE(melown)
     PYSUPPORT_REGISTER_STD_ARRAY(double, 5);
 
 #undef PYSUPPORT_REGISTER_STD_ARRAY
+
+
+    scope().attr("__path__") = "";
+
+    pysupport::packageCallback(scope());
 }
 
 namespace pysupport {
@@ -159,21 +170,24 @@ bp::object package()
 void addModuleToPackage(const char *name, ::PyObject *module
                         , const PackageCallback &callback)
 {
-    auto p(package());
+    addModuleToPackage(name, module
+                       , pysupport::packageName, package()
+                       , callback);
+}
 
-    bp::handle<> m(module);
-
-    if (-1 == ::PyModule_AddObject(p.ptr(), name, bp::incref(module))) {
-        LOG(warn2) << "Failed to add module <" << name
-                   << "> to package <melown>.";
-        bp::throw_error_already_set();
+void addModuleToPackage(const char *name, ::PyObject *module
+                        , const bp::object *package
+                        , const PackageCallback &callback)
+{
+    if (package) {
+        const auto &p(*package);
+        const auto pn(bp::extract<std::string>(p.attr("__name__"))());
+        addModuleToPackage(name, module, pn.c_str(), p, callback);
+    } else {
+        addModuleToPackage(name, module
+                           , pysupport::packageName, pysupport::package()
+                           , callback);
     }
-
-    auto sys(bp::import("sys"));
-    sys.attr("modules")[str(boost::format("%s.%s")
-                            % packageName % name)] = m;
-
-    if (callback) { callback(p, bp::object(m)); }
 }
 
 void addModuleToPackage(const char *name, ::PyObject *module
@@ -188,9 +202,10 @@ void addModuleToPackage(const char *name, ::PyObject *module
         bp::throw_error_already_set();
     }
 
+    const auto fullName(str(boost::format("%s.%s") % packageName % name));
+
     auto sys(bp::import("sys"));
-    sys.attr("modules")[str(boost::format("%s.%s")
-                            % packageName % name)] = m;
+    sys.attr("modules")[fullName] = m;
 
     if (callback) { callback(package, bp::object(m)); }
 }
