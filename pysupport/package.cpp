@@ -89,9 +89,9 @@ fs::path asPath(const std::string &path)
     return fs::path(path);
 }
 
-void packageCallback(bp::object package) __attribute__ ((weak));
+void packageCallback(const bp::object &package) __attribute__ ((weak));
 
-void packageCallback(bp::object package) {
+void packageCallback(const bp::object &package) {
     (void) package;
 }
 
