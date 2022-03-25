@@ -127,6 +127,9 @@ BOOST_PYTHON_MODULE(melown)
         ;
 
     def("path", &pysupport::asPath);
+    bp::class_<std::vector<fs::path>>("path_list")
+        .def(bp::vector_indexing_suite<std::vector<fs::path>>())
+        ;
 
 #define PYSUPPORT_REGISTER_STD_ARRAY(T, N)                              \
     class_<std::array<T, N>>(#T #N  "_array")                           \
