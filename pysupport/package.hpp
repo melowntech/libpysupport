@@ -46,6 +46,12 @@ PackageCallback;
 void addModuleToPackage(const char *name, ::PyObject *module
                         , const PackageCallback &callback = PackageCallback());
 
+/** Adds given module to given existing package
+ */
+void addModuleToPackage(const char *name, ::PyObject *module
+                        , const boost::python::object *package = nullptr
+                        , const PackageCallback &callback = PackageCallback());
+
 /** Adds given module to provided package.
  */
 void addModuleToPackage(const char *name, ::PyObject *module
@@ -56,14 +62,16 @@ void addModuleToPackage(const char *name, ::PyObject *module
 #define PYSUPPORT_MODULE_IMPORT_CALLBACK(name, cb)                  \
     namespace { std::once_flag name##_onceFlag; }                   \
                                                                     \
-    boost::python::object import() {                                \
+    boost::python::object                                           \
+    import(const boost::python::object *package)                    \
+    {                                                               \
         std::call_once(name##_onceFlag, [&]()                       \
         {                                                           \
             pysupport::addModuleToPackage                           \
-                (#name, PyInit_melown_##name(), cb);                \
+                (#name, PyInit_melown_##name(), package, cb);       \
         });                                                         \
                                                                     \
-        return bp::import("melown."#name);                          \
+        return bp::import("sys").attr("modules")["melown."#name];   \
     }
 
 #define PYSUPPORT_MODULE_IMPORT(name)                                   \
