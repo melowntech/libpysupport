@@ -122,7 +122,7 @@ BOOST_PYTHON_MODULE(melown)
         .def(vector_indexing_suite<std::vector<double>>())
         ;
 
-    class_<std::vector<std::string>>("string_list>")
+    class_<std::vector<std::string>>("string_list")
         .def(vector_indexing_suite<std::vector<std::string>>())
         ;
 
