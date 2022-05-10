@@ -28,6 +28,11 @@
 
 #include <boost/python/import.hpp>
 
+#ifdef _WIN32
+#undef vsnprintf
+#undef snprintf
+#endif
+
 #include "dbglog/dbglog.hpp"
 
 #include "string.hpp"
