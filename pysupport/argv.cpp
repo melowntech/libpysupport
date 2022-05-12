@@ -24,20 +24,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "argv.hpp"
+
 #include <string>
 #include <vector>
 
 #include <boost/python/slice.hpp>
 #include <boost/python/object_slices.hpp>
 
-#ifdef _WIN32
-#undef vsnprintf
-#undef snprintf
-#endif
-
 #include "dbglog/dbglog.hpp"
 
-#include "argv.hpp"
 #include "hasattr.hpp"
 #include "setattr.hpp"
 

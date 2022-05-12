@@ -27,6 +27,7 @@
 #ifndef pysupport_profiler_hpp_included_
 #define pysupport_profiler_hpp_included_
 
+#include "boost-python-definitions.hpp"
 #include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
 #include <boost/python/object.hpp>

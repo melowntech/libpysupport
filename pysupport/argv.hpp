@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include "boost-python-definitions.hpp"
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 

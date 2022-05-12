@@ -1,6 +1,7 @@
+#include "iostreams.hpp"
+
 #include <boost/iostreams/filtering_stream.hpp>
 
-#include "iostreams.hpp"
 #include "hasattr.hpp"
 
 namespace bp = boost::python;

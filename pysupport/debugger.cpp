@@ -24,19 +24,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "debugger.hpp"
+
 #include <boost/lexical_cast.hpp>
 
 #include <boost/python/import.hpp>
 
-#ifdef _WIN32
-#undef vsnprintf
-#undef snprintf
-#endif
-
 #include "dbglog/dbglog.hpp"
 
 #include "string.hpp"
-#include "debugger.hpp"
 
 namespace bp = boost::python;
 namespace fs = boost::filesystem;

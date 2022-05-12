@@ -29,6 +29,7 @@
 
 #include <mutex>
 
+#include "boost-python-definitions.hpp"
 #include <boost/python.hpp>
 
 namespace pysupport {

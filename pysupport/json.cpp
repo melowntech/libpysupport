@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "json.hpp"
+
 #include <string>
 #include <vector>
 
@@ -31,15 +33,9 @@
 #include <boost/python/object_slices.hpp>
 #include <boost/python/stl_iterator.hpp>
 
-#ifdef _WIN32
-#undef vsnprintf
-#undef snprintf
-#endif
-
 #include "dbglog/dbglog.hpp"
 
 #include "string.hpp"
-#include "json.hpp"
 
 namespace bp = boost::python;
 

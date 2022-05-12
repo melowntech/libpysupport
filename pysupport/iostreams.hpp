@@ -30,6 +30,7 @@
 #include <memory>
 #include <iostream>
 
+#include "boost-python-definitions.hpp"
 #include <boost/python/object.hpp>
 
 namespace pysupport {

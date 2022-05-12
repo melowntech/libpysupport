@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "package.hpp"
+
 #include <vector>
 #include <mutex>
 
@@ -35,7 +37,6 @@
 
 #include "dbglog/dbglog.hpp"
 
-#include "package.hpp"
 #include "converters.hpp"
 #include "iostreams.hpp"
 #include "array.hpp"
