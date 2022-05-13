@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <pysupport/boost-python-definitions.hpp>
+
 #include <Python.h>
 
 #include <boost/filesystem.hpp>

@@ -27,6 +27,7 @@
 #define boost_python_definitions_hpp_included_
 
 #ifdef _WIN32
+// Workarounds
 #include <cmath>
 #include <cstdio>
 namespace std { 
@@ -34,6 +35,13 @@ namespace std {
     template<typename... Ts> inline auto _vsnprintf(Ts... args) { return ::std::vsnprintf(args...); } 
     template<typename... Ts> inline auto _snprintf(Ts... args) { return ::std::snprintf(args...); } 
 }
+// Use only release version of python for Windows build
+#ifdef _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
+#else
+#include <Python.h>
 #endif
-
+#endif
 #endif
