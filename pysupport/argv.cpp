@@ -47,7 +47,7 @@ void argvImpl(const Argv &argv)
     // create new argv vector, replacing original
     auto sys(bp::import("sys"));
     bp::list sys_argv;
-    for (const auto arg : argv) {
+    for (const auto &arg : argv) {
         sys_argv.append(bp::str(arg));
     }
     setattr(sys, "argv", sys_argv);
