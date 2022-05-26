@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "package.hpp"
+
 #include <vector>
 #include <mutex>
 
@@ -35,7 +37,6 @@
 
 #include "dbglog/dbglog.hpp"
 
-#include "package.hpp"
 #include "converters.hpp"
 #include "iostreams.hpp"
 #include "array.hpp"
@@ -77,7 +78,7 @@ struct from_python_path
         // get memory
         void *storage(((Storage*) data)->storage.bytes);
 
-        new (storage) fs::path(boost::python::extract<std::string>(ptr));
+        new (storage) fs::path(std::string(boost::python::extract<std::string>(ptr)));
 
         // Stash the memory chunk pointer for later use by boost.python
         data->convertible = storage;
@@ -89,7 +90,9 @@ fs::path asPath(const std::string &path)
     return fs::path(path);
 }
 
+#ifndef _WIN32
 void packageCallback(const bp::object &package) __attribute__ ((weak));
+#endif
 
 void packageCallback(const bp::object &package) {
     (void) package;

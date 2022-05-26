@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "json.hpp"
+
 #include <string>
 #include <vector>
 
@@ -34,7 +36,6 @@
 #include "dbglog/dbglog.hpp"
 
 #include "string.hpp"
-#include "json.hpp"
 
 namespace bp = boost::python;
 

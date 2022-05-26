@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "debugger.hpp"
+
 #include <boost/lexical_cast.hpp>
 
 #include <boost/python/import.hpp>
@@ -31,7 +33,6 @@
 #include "dbglog/dbglog.hpp"
 
 #include "string.hpp"
-#include "debugger.hpp"
 
 namespace bp = boost::python;
 namespace fs = boost::filesystem;

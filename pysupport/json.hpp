@@ -27,6 +27,7 @@
 #ifndef pysupport_json_hpp_included_
 #define pysupport_json_hpp_included_
 
+#include "boost-python-definitions.hpp"
 #include <boost/python.hpp>
 
 #include "jsoncpp/json.hpp"

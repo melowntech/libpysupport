@@ -27,6 +27,8 @@
 #ifndef pysupport_threads_hpp_included_
 #define pysupport_threads_hpp_included_
 
+#include <pysupport/boost-python-definitions.hpp>
+
 #include <Python.h>
 
 namespace pysupport {

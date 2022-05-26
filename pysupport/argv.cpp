@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "argv.hpp"
+
 #include <string>
 #include <vector>
 
@@ -32,7 +34,6 @@
 
 #include "dbglog/dbglog.hpp"
 
-#include "argv.hpp"
 #include "hasattr.hpp"
 #include "setattr.hpp"
 

@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "profiler.hpp"
+
 #include <cstdio>
 
 #include <boost/lexical_cast.hpp>
@@ -36,7 +38,6 @@
 
 #include "string.hpp"
 #include "setattr.hpp"
-#include "profiler.hpp"
 
 namespace bp = boost::python;
 namespace fs = boost::filesystem;

@@ -26,6 +26,8 @@
 
 #include <string.h>
 
+#include <pysupport/boost-python-definitions.hpp>
+
 #include <Python.h>
 
 #include <boost/python/dict.hpp>

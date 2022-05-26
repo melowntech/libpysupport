@@ -1,5 +1,5 @@
 # bump version here
-set(pysupport_VERSION 1.4)
+set(pysupport_VERSION 1.5)
 
 set(pysupport_jsoncpp_SOURCES)
 set(pysupport_DEPENDS)
