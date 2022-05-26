@@ -27,15 +27,8 @@
 #define boost_python_definitions_hpp_included_
 
 #ifdef _WIN32
-// Workarounds
-#include <cmath>
-#include <cstdio>
-namespace std { 
-    template<typename... Ts> inline auto _copysign(Ts... args) { return ::std::copysign(args...); } 
-    template<typename... Ts> inline auto _vsnprintf(Ts... args) { return ::std::vsnprintf(args...); } 
-    template<typename... Ts> inline auto _snprintf(Ts... args) { return ::std::snprintf(args...); } 
-}
 // Use only release version of python for Windows build
+// Release version of python is linked instead in buildsys
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
