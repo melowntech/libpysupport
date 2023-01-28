@@ -7,7 +7,7 @@ set(pysupport_DEPENDS)
 if(MODULE_jsoncpp_FOUND)
   message(STATUS "pysupport: compiling in jsoncpp support")
 
-  list(APPEND pysupport_DEPENDS jsoncpp)
+  list(APPEND pysupport_DEPENDS jsoncppwrapper)
 
   set(pysupport_jsoncpp_SOURCES json.hpp json.cpp)
 else()
